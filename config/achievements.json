@@ -1,0 +1,216 @@
+{
+  "achievements": [
+    {
+      "id": "speedrunner",
+      "name": "Speedrunner",
+      "tier": "gold",
+      "trigger": "complete_jump_fast",
+      "condition": {
+        "type": "jump_completion_time",
+        "threshold": 0.10
+      },
+      "reward_type": "cp_multiplier",
+      "reward_value": 1.25,
+      "description": "Completed jump in less than 10% of available time",
+      "icon": "⚡"
+    },
+    {
+      "id": "synergy_master",
+      "name": "Synergy Master",
+      "tier": "silver",
+      "trigger": "use_multiple_perks_creatively",
+      "condition": {
+        "type": "synergy_combo",
+        "min_perks": 3
+      },
+      "reward_type": "unlock",
+      "reward_value": "perk_fusion",
+      "description": "Used 3+ perks in a creative combination",
+      "icon": "💫"
+    },
+    {
+      "id": "flawless_victory",
+      "name": "Flawless Victory",
+      "tier": "platinum",
+      "trigger": "perfect_jump_completion",
+      "condition": {
+        "type": "perfect_run",
+        "requirements": ["all_objectives_complete", "no_companion_deaths", "no_failures"]
+      },
+      "reward_type": "extra_perk",
+      "reward_value": 1,
+      "description": "Completed jump with all objectives, no casualties",
+      "icon": "👑"
+    },
+    {
+      "id": "creative_genius",
+      "name": "Creative Genius",
+      "tier": "bronze",
+      "trigger": "unexpected_solution",
+      "condition": {
+        "type": "creative_action",
+        "novelty_threshold": 0.8
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 50,
+      "description": "Solved problem with unexpected approach",
+      "icon": "💡"
+    },
+    {
+      "id": "pacifist_master",
+      "name": "Pacifist Master",
+      "tier": "gold",
+      "trigger": "complete_jump_no_kills",
+      "condition": {
+        "type": "jump_completion",
+        "kill_count": 0
+      },
+      "reward_type": "cp_multiplier",
+      "reward_value": 1.15,
+      "description": "Completed jump without killing anyone",
+      "icon": "☮️"
+    },
+    {
+      "id": "power_gamer",
+      "name": "Power Gamer",
+      "tier": "silver",
+      "trigger": "optimize_build",
+      "condition": {
+        "type": "optimization",
+        "efficiency_threshold": 0.90
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 100,
+      "description": "Achieved 90%+ build optimization efficiency",
+      "icon": "📊"
+    },
+    {
+      "id": "social_butterfly",
+      "name": "Social Butterfly",
+      "tier": "bronze",
+      "trigger": "high_relationship",
+      "condition": {
+        "type": "relationships",
+        "min_companions": 3,
+        "min_level": 8
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 75,
+      "description": "Achieved relationship level 8+ with 3+ companions",
+      "icon": "🤝"
+    },
+    {
+      "id": "crisis_manager",
+      "name": "Crisis Manager",
+      "tier": "silver",
+      "trigger": "resolve_multiple_crises",
+      "condition": {
+        "type": "crisis_resolution",
+        "min_crises": 3,
+        "success_rate": 1.0
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 150,
+      "description": "Successfully resolved 3+ crises without failure",
+      "icon": "🚨"
+    },
+    {
+      "id": "lore_master",
+      "name": "Lore Master",
+      "tier": "bronze",
+      "trigger": "discover_lore",
+      "condition": {
+        "type": "knowledge_discovery",
+        "min_discoveries": 10
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 50,
+      "description": "Discovered 10+ pieces of world lore",
+      "icon": "📚"
+    },
+    {
+      "id": "tactical_genius",
+      "name": "Tactical Genius",
+      "tier": "gold",
+      "trigger": "defeat_stronger_opponent",
+      "condition": {
+        "type": "combat_victory",
+        "power_difference": 3.0
+      },
+      "reward_type": "cp_multiplier",
+      "reward_value": 1.20,
+      "description": "Defeated opponent 3x stronger through tactics",
+      "icon": "🎯"
+    },
+    {
+      "id": "world_shaper",
+      "name": "World Shaper",
+      "tier": "platinum",
+      "trigger": "major_world_change",
+      "condition": {
+        "type": "world_impact",
+        "scope": "global"
+      },
+      "reward_type": "cp_multiplier",
+      "reward_value": 1.50,
+      "description": "Fundamentally altered the world's trajectory",
+      "icon": "🌍"
+    },
+    {
+      "id": "hero_of_the_people",
+      "name": "Hero of the People",
+      "tier": "silver",
+      "trigger": "save_civilians",
+      "condition": {
+        "type": "civilian_saves",
+        "min_saved": 100
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 125,
+      "description": "Saved 100+ civilians from danger",
+      "icon": "🦸"
+    },
+    {
+      "id": "conspiracy_unraveled",
+      "name": "Conspiracy Unraveled",
+      "tier": "gold",
+      "trigger": "expose_conspiracy",
+      "condition": {
+        "type": "investigation_complete",
+        "complexity": "high"
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 200,
+      "description": "Uncovered and exposed major conspiracy",
+      "icon": "🔍"
+    },
+    {
+      "id": "broken_combo",
+      "name": "Broken Combo",
+      "tier": "platinum",
+      "trigger": "discover_broken_synergy",
+      "condition": {
+        "type": "synergy_power",
+        "multiplier": 10.0
+      },
+      "reward_type": "extra_perk",
+      "reward_value": 1,
+      "description": "Discovered synergy with 10x+ power multiplier",
+      "icon": "💥"
+    },
+    {
+      "id": "first_steps",
+      "name": "First Steps",
+      "tier": "bronze",
+      "trigger": "complete_first_turn",
+      "condition": {
+        "type": "turn_count",
+        "count": 1
+      },
+      "reward_type": "cp_bonus",
+      "reward_value": 25,
+      "description": "Completed your first turn",
+      "icon": "👣"
+    }
+  ]
+}

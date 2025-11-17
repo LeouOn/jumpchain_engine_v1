@@ -1,0 +1,102 @@
+# Jumpchain Engine Configuration
+
+# LLM Endpoints
+# Configure endpoints for different AI models used in the system
+llm_endpoints:
+  # Main narration (Claude Sonnet 4.5)
+  narration:
+    model: "claude-sonnet-4-5"
+    endpoint: "http://localhost:5000/v1/chat/completions"
+    api_key: ""  # Set via environment variable CLAUDE_API_KEY
+
+  # Calculation/optimization (DeepSeek R1 or similar)
+  calculation:
+    model: "deepseek-r1"
+    endpoint: "http://localhost:5001/v1/chat/completions"
+    api_key: ""
+
+  # Background simulation (Qwen 2.5 72B or similar)
+  background:
+    model: "qwen-2.5-72b"
+    endpoint: "http://localhost:5002/v1/chat/completions"
+    api_key: ""
+
+  # Companion personalities (Gemma 2 27B or similar)
+  companions:
+    model: "gemma-2-27b"
+    endpoint: "http://localhost:5003/v1/chat/completions"
+    api_key: ""
+
+# Database Configuration
+database:
+  path: "data/jumpchain.db"
+  backup_interval: 10  # Create backup every N turns
+  auto_backup: true
+
+# Gameplay Settings
+gameplay:
+  tone: "serious_comedy"  # Options: serious_comedy, dark, heroic, absurdist
+  auto_save: true
+  difficulty: "balanced"  # Options: easy, balanced, hard, brutal
+
+  # Turn settings
+  days_per_turn: 1
+
+  # CP settings
+  base_cp: 1000
+  companion_cp: 600
+
+# Reward System Configuration
+rewards:
+  bronze_multiplier: 1.05  # +5% CP
+  silver_multiplier: 1.10  # +10% CP
+  gold_multiplier: 1.25    # +25% CP
+  platinum_multiplier: 1.50  # +50% CP
+
+  # Achievement tracking
+  track_speedruns: true
+  track_synergies: true
+  track_perfect_runs: true
+
+# Narration Settings
+narration:
+  max_length_words: 500
+  include_companion_dialogue: true
+  show_mechanics: false  # Hide dice rolls/calculations from player
+  hint_at_background: true  # Include subtle hints about off-screen events
+  style:
+    - "Serious competence with comedic undertones"
+    - "Highlight synergy uses"
+    - "Show 'speedrunner glitch' moments when using precog perks"
+
+# Background Simulation Settings
+background_simulation:
+  enabled: true
+  events_per_turn: 2  # Average number of background events
+  crisis_chance: 0.05  # 5% chance of crisis per turn
+  opportunity_chance: 0.10  # 10% chance of opportunity per turn
+
+# Companion AI Settings
+companion_ai:
+  enabled: true
+  autonomous_actions: true  # Companions can initiate actions
+  relationship_evolution: true
+  memory_depth: 20  # Remember last N events
+
+# World Building Settings
+world_building:
+  auto_populate: true
+  wiki_scraping: true
+  timeline_generation: true
+
+# UI Settings
+ui:
+  interface: "cli"  # Options: cli, web
+  colors: true
+  animations: false
+
+# Debug Settings
+debug:
+  verbose_logging: false
+  show_llm_prompts: false
+  show_calculation_details: false
