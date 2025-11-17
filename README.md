@@ -80,6 +80,24 @@ Do Qi Gong daily? Unlock "Internal Energy" stat.
 - In-game rewards for real completion
 - Beautiful Claude narration for achievements
 
+### Momentum & Boost System
+- **10 Daily Tasks**: Meditation, exercise, creative work, kindness, and more
+- **5 Weekly Goals**: Compound objectives with special unlocks
+- **8 Virtue Types**: Progressive mastery (Courage, Wisdom, Temperance, Justice, Compassion, Diligence, Honesty, Humility)
+- **Impact Logging**: Track real-world good deeds across 8 categories
+- **Streak Bonuses**: +10% CP per day streak (cap at 2x)
+- **Compound Growth**: All systems multiply together for exponential momentum
+- **Virtue Progression**: Level 0-10 with bonuses at 3, 5, 7, 10
+- **Cross-Application**: Modular design works in habit trackers, journaling apps, dashboards
+
+### Universal LLM Provider System
+- **Modular Architecture**: Add any LLM through simple provider interface
+- **Z.AI Integration**: Official SDK support for GLM models (4-air, 4.6, 4-plus)
+- **Automatic Fallback**: Try providers in order until success
+- **Cost Tracking**: Monitor spending per provider with detailed statistics
+- **Provider Options**: Local (LM Studio), Z.AI, OpenRouter, Anthropic (Claude)
+- **Streaming Support**: Real-time responses where available
+
 ### Achievement System
 - Bronze/Silver/Gold/Platinum tiers
 - Synergy detection achievements
@@ -241,16 +259,20 @@ jumpchain_engine_v1/
 │   │   └── orchestrator.py       # Main game loop
 │   ├── engines/
 │   │   ├── calculation.py         # Synergy detection, power calculation
-│   │   ├── llm_client.py         # Multi-LLM client
+│   │   ├── llm_providers.py      # Universal LLM provider system
+│   │   ├── momentum_system.py    # Daily tasks, virtues, impact tracking
 │   │   ├── shadow_work.py        # Shadow integration system
 │   │   └── real_world_bridge.py  # Practice → game bridge
 │   ├── parsers/
 │   │   └── jump_doc_parser.py    # Parse jumpchain PDFs
 │   └── ui/
 │       └── cli.py                 # Terminal interface
+├── examples/
+│   └── using_across_applications.py  # 6 examples of modular reuse
 ├── scripts/
 │   ├── init_database.py           # Setup script
-│   └── test_phase2.py            # Testing
+│   ├── test_phase2.py            # Core mechanics tests
+│   └── test_momentum.py          # Momentum system tests
 └── schema.sql                     # Database schema
 ```
 
@@ -267,6 +289,18 @@ python scripts/test_phase2.py
 # ✓ Jump Parser (PDF parsing, perk extraction)
 # ✓ Turn Orchestrator (turn processing, achievements)
 # ✓ Configuration (settings loading)
+
+# Test momentum system (Phase 2.5)
+python scripts/test_momentum.py
+
+# All tests should pass:
+# ✓ Daily Tasks (activation, completion, streaks)
+# ✓ Streak Tracking (bonus multipliers)
+# ✓ Virtue Progression (leveling, bonuses)
+# ✓ Weekly Goals (progress, completion)
+# ✓ Impact Logging (real-world good deeds)
+# ✓ Compound Bonuses (exponential growth)
+# ✓ Momentum Summary (complete status)
 ```
 
 ---
@@ -331,15 +365,22 @@ From the [Deep System Architecture](docs/DEEP_SYSTEM_ARCHITECTURE.md):
 - Achievement system
 
 **Phase 2.5: Deep Systems** ✅ COMPLETE
-- Three-tier LLM client (local, analytical, deep)
-- Shadow work integration
-- Real-world practice bridge
+- Universal LLM provider system (Z.AI, LM Studio, OpenRouter, Claude)
+- Automatic fallback orchestration
+- Shadow work integration (10 shadow aspects)
+- Real-world practice bridge (8 practices)
+- Momentum & boost system (10 daily tasks, 5 weekly goals)
+- Virtue progression (8 virtues, 0-10 levels)
+- Impact logging (8 categories of doing good)
+- Compound growth bonuses
 - Cost tracking and management
+- Cross-application examples (6 use cases)
 
-**Phase 3: Full Integration** (In Progress)
+**Phase 3: Full Integration** (Next)
 - Polish deep narration prompts
 - Expand shadow work library
 - Add more real-world practices
+- Build full game loop with all systems
 - Comprehensive testing with actual use
 
 ---
