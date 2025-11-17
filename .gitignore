@@ -45,6 +45,13 @@ data/exports/*
 # Keep data directory structure but ignore contents
 !data/.gitkeep
 
+# Environment variables (SECURITY: Never commit these!)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
 # OS
 .DS_Store
 Thumbs.db

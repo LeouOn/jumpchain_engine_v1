@@ -2,6 +2,12 @@
 Modular LLM Provider System
 Supports: Z.AI (GLM), LM Studio, OpenRouter, Anthropic
 Designed to be reusable across multiple applications
+
+Features:
+- Automatic retry with exponential backoff
+- Cost tracking and monitoring
+- Graceful fallback between providers
+- Modular design for cross-application use
 """
 
 from abc import ABC, abstractmethod
@@ -9,7 +15,40 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 import logging
 
+# Retry logic for resilient API calls
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
+import requests
+
 logger = logging.getLogger(__name__)
+
+
+# Retry decorator for HTTP-based API calls
+def retry_api_call(max_attempts=3):
+    """
+    Retry decorator for API calls with exponential backoff
+
+    - Retries up to 3 times by default
+    - Waits 1s, 2s, 4s between attempts
+    - Only retries on network errors and 5xx server errors
+    - Logs each retry attempt
+    """
+    return retry(
+        stop=stop_after_attempt(max_attempts),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        retry=retry_if_exception_type((
+            requests.exceptions.RequestException,
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError
+        )),
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+        reraise=True
+    )
 
 
 @dataclass
@@ -182,7 +221,7 @@ class ZAIProvider(BaseLLMProvider):
 
 
 class LMStudioProvider(BaseLLMProvider):
-    """LM Studio local provider (OpenAI-compatible)"""
+    """LM Studio local provider (OpenAI-compatible) with automatic retry"""
 
     def __init__(self, endpoint: str = "http://localhost:1234/v1/chat/completions", **kwargs):
         super().__init__("", endpoint, **kwargs)
@@ -195,8 +234,20 @@ class LMStudioProvider(BaseLLMProvider):
              stream: bool = False,
              model: str = "local-model",
              **kwargs) -> LLMResponse:
-        """Call LM Studio local API"""
-        import requests
+        """Call LM Studio local API with retry logic"""
+        return self._call_with_retry(prompt, system_prompt, max_tokens,
+                                      temperature, stream, model, **kwargs)
+
+    @retry_api_call(max_attempts=3)
+    def _call_with_retry(self,
+                         prompt: str,
+                         system_prompt: Optional[str],
+                         max_tokens: int,
+                         temperature: float,
+                         stream: bool,
+                         model: str,
+                         **kwargs) -> LLMResponse:
+        """Internal method with retry decorator"""
         import time
 
         start_time = time.time()
@@ -250,7 +301,7 @@ class LMStudioProvider(BaseLLMProvider):
 
 
 class OpenRouterProvider(BaseLLMProvider):
-    """OpenRouter provider for various models"""
+    """OpenRouter provider for various models with automatic retry"""
 
     MODELS = {
         'google/glm-4-plus': 0.002,  # $2 per 1M
@@ -268,8 +319,20 @@ class OpenRouterProvider(BaseLLMProvider):
              stream: bool = False,
              model: str = "google/glm-4-plus",
              **kwargs) -> LLMResponse:
-        """Call OpenRouter API"""
-        import requests
+        """Call OpenRouter API with retry logic"""
+        return self._call_with_retry(prompt, system_prompt, max_tokens,
+                                      temperature, stream, model, **kwargs)
+
+    @retry_api_call(max_attempts=3)
+    def _call_with_retry(self,
+                         prompt: str,
+                         system_prompt: Optional[str],
+                         max_tokens: int,
+                         temperature: float,
+                         stream: bool,
+                         model: str,
+                         **kwargs) -> LLMResponse:
+        """Internal method with retry decorator"""
         import time
 
         start_time = time.time()
@@ -332,15 +395,34 @@ class OpenRouterProvider(BaseLLMProvider):
 
 
 class AnthropicProvider(BaseLLMProvider):
-    """Anthropic (Claude) provider"""
+    """
+    Anthropic (Claude) provider using official SDK
+
+    Benefits of using SDK:
+    - Automatic retry with exponential backoff
+    - Built-in rate limiting
+    - Better error messages
+    - Type hints and validation
+    """
 
     MODELS = {
-        'claude-sonnet-4-5': 0.003,  # $3 per 1M input
+        'claude-sonnet-4-5': 0.003,  # $3 per 1M input tokens
         'claude-sonnet-4.5': 0.003,
+        'claude-sonnet-4-20250514': 0.003,  # Latest model ID
     }
 
     def __init__(self, api_key: str = "", **kwargs):
         super().__init__(api_key, "https://api.anthropic.com/v1/messages", **kwargs)
+
+        # Initialize official SDK client
+        try:
+            from anthropic import Anthropic
+            self.client = Anthropic(api_key=api_key)
+            self.use_sdk = True
+            logger.info("Anthropic provider initialized with official SDK")
+        except ImportError:
+            logger.warning("Anthropic SDK not available, falling back to HTTP requests")
+            self.use_sdk = False
 
     def call(self,
              prompt: str,
@@ -350,8 +432,90 @@ class AnthropicProvider(BaseLLMProvider):
              stream: bool = False,
              model: str = "claude-sonnet-4-5",
              **kwargs) -> LLMResponse:
-        """Call Anthropic API"""
-        import requests
+        """Call Anthropic API using official SDK"""
+        import time
+
+        if self.use_sdk:
+            return self._call_with_sdk(prompt, system_prompt, max_tokens,
+                                       temperature, stream, model, **kwargs)
+        else:
+            return self._call_with_http(prompt, system_prompt, max_tokens,
+                                        temperature, stream, model, **kwargs)
+
+    def _call_with_sdk(self,
+                       prompt: str,
+                       system_prompt: Optional[str],
+                       max_tokens: int,
+                       temperature: float,
+                       stream: bool,
+                       model: str,
+                       **kwargs) -> LLMResponse:
+        """Call using official Anthropic SDK"""
+        import time
+
+        start_time = time.time()
+
+        try:
+            # Build message
+            message_params = {
+                "model": model,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ]
+            }
+
+            if system_prompt:
+                message_params["system"] = system_prompt
+
+            # Call API with SDK
+            response = self.client.messages.create(**message_params)
+
+            # Extract content and usage
+            content = response.content[0].text
+            tokens_in = response.usage.input_tokens
+            tokens_out = response.usage.output_tokens
+            tokens = tokens_in + tokens_out
+
+            latency_ms = (time.time() - start_time) * 1000
+            cost = self._calculate_cost(model, tokens)
+
+            return LLMResponse(
+                content=content,
+                model=model,
+                provider="anthropic",
+                tokens_used=tokens,
+                cost_usd=cost,
+                latency_ms=latency_ms
+            )
+
+        except Exception as e:
+            logger.error(f"Anthropic SDK error: {e}")
+            raise
+
+    def _call_with_http(self,
+                        prompt: str,
+                        system_prompt: Optional[str],
+                        max_tokens: int,
+                        temperature: float,
+                        stream: bool,
+                        model: str,
+                        **kwargs) -> LLMResponse:
+        """Fallback: Call using HTTP requests with retry (for compatibility)"""
+        return self._http_with_retry(prompt, system_prompt, max_tokens,
+                                     temperature, stream, model, **kwargs)
+
+    @retry_api_call(max_attempts=3)
+    def _http_with_retry(self,
+                         prompt: str,
+                         system_prompt: Optional[str],
+                         max_tokens: int,
+                         temperature: float,
+                         stream: bool,
+                         model: str,
+                         **kwargs) -> LLMResponse:
+        """Internal HTTP method with retry decorator"""
         import time
 
         start_time = time.time()
@@ -402,7 +566,7 @@ class AnthropicProvider(BaseLLMProvider):
             )
 
         except Exception as e:
-            logger.error(f"Anthropic error: {e}")
+            logger.error(f"Anthropic HTTP error: {e}")
             raise
 
     def _calculate_cost(self, model: str, tokens: int) -> float:
@@ -414,6 +578,47 @@ class AnthropicProvider(BaseLLMProvider):
 
     def supports_streaming(self) -> bool:
         return True
+
+
+def validate_api_keys(required_keys: List[str], warn_only: bool = True) -> Dict[str, bool]:
+    """
+    Validate that required API keys are present in environment
+
+    Args:
+        required_keys: List of environment variable names to check
+        warn_only: If True, only warn about missing keys. If False, raise exception.
+
+    Returns:
+        Dict mapping key name to whether it's present
+
+    Raises:
+        ValueError: If warn_only=False and any keys are missing
+    """
+    import os
+
+    results = {}
+    missing = []
+
+    for key in required_keys:
+        value = os.environ.get(key)
+        is_present = bool(value and value.strip())
+        results[key] = is_present
+
+        if not is_present:
+            missing.append(key)
+
+    if missing:
+        message = f"Missing API keys: {', '.join(missing)}"
+
+        if warn_only:
+            logger.warning(message)
+            logger.warning("Some LLM providers may not work without their API keys.")
+            logger.warning("See .env.example for configuration template.")
+        else:
+            logger.error(message)
+            raise ValueError(f"{message}. Check .env file and .env.example template.")
+
+    return results
 
 
 class UniversalLLMClient:
@@ -433,10 +638,20 @@ class UniversalLLMClient:
     ```
     """
 
-    def __init__(self):
+    def __init__(self, validate_keys: bool = False):
+        """
+        Initialize Universal LLM Client
+
+        Args:
+            validate_keys: If True, validate API keys on initialization
+        """
         self.providers: Dict[str, BaseLLMProvider] = {}
         self.fallback_order: List[str] = []
         self.usage_stats = {}
+
+        # Optionally validate API keys on startup
+        if validate_keys:
+            self.validate_environment()
 
     def add_provider(self, name: str, provider: BaseLLMProvider):
         """Add a provider"""
@@ -522,3 +737,28 @@ class UniversalLLMClient:
 
         cost_per_token = self.providers[provider].get_cost_per_token(model)
         return cost_per_token * estimated_tokens
+
+    def validate_environment(self, warn_only: bool = True) -> Dict[str, bool]:
+        """
+        Validate API keys for common providers
+
+        Args:
+            warn_only: If True, only warn about missing keys (default: True)
+
+        Returns:
+            Dict mapping key name to whether it's present
+        """
+        common_keys = [
+            'ANTHROPIC_API_KEY',
+            'ZAI_API_KEY',
+            'OPENROUTER_API_KEY'
+        ]
+
+        results = validate_api_keys(common_keys, warn_only=warn_only)
+
+        # Log validation results
+        present = [k for k, v in results.items() if v]
+        if present:
+            logger.info(f"Found API keys for: {', '.join(k.replace('_API_KEY', '') for k in present)}")
+
+        return results

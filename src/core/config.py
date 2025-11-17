@@ -10,6 +10,10 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 import logging
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 logger = logging.getLogger(__name__)
 
 

@@ -93,10 +93,14 @@ Do Qi Gong daily? Unlock "Internal Energy" stat.
 ### Universal LLM Provider System
 - **Modular Architecture**: Add any LLM through simple provider interface
 - **Z.AI Integration**: Official SDK support for GLM models (4-air, 4.6, 4-plus)
+- **Anthropic SDK**: Official Claude SDK with automatic retry and rate limiting
 - **Automatic Fallback**: Try providers in order until success
+- **Retry Logic**: Automatic retry with exponential backoff for all HTTP providers
+- **API Key Validation**: Startup validation with helpful error messages
 - **Cost Tracking**: Monitor spending per provider with detailed statistics
 - **Provider Options**: Local (LM Studio), Z.AI, OpenRouter, Anthropic (Claude)
 - **Streaming Support**: Real-time responses where available
+- **Environment Management**: Secure .env file support for API keys
 
 ### Achievement System
 - Bronze/Silver/Gold/Platinum tiers
@@ -114,27 +118,43 @@ Do Qi Gong daily? Unlock "Internal Energy" stat.
 pip install -r requirements.txt
 ```
 
-### 2. Setup LLMs
+### 2. Setup Environment Variables
+
+**Create .env file** (copy from template):
+```bash
+cp .env.example .env
+```
+
+**Edit .env** and add your API keys:
+```bash
+# Required for Claude (deep narration)
+ANTHROPIC_API_KEY=your_anthropic_key_here
+
+# Required for GLM models (analytical tier)
+ZAI_API_KEY=your_zai_key_here
+
+# Optional: Alternative model access
+OPENROUTER_API_KEY=your_openrouter_key_here
+```
+
+**Security Note**: Never commit your .env file! It's already in .gitignore.
+
+### 3. Setup LLMs
 
 **LM Studio (Local - Free)**
 ```bash
 # Download from https://lmstudio.ai
-# Load GLM 4.5 Air
+# Load GLM 4.5 Air or similar model
 # Start server (localhost:1234)
-# Update config/settings.yaml if needed
+# No API key needed - it's local!
 ```
 
-**OpenRouter (API)**
-```bash
-export OPENROUTER_API_KEY="your-key"
-```
+**Get API Keys:**
+- **Anthropic**: https://console.anthropic.com/
+- **Z.AI (GLM)**: https://bigmodel.cn/
+- **OpenRouter**: https://openrouter.ai/
 
-**Anthropic (Claude)**
-```bash
-export ANTHROPIC_API_KEY="your-key"
-```
-
-### 3. Initialize Database
+### 4. Initialize Database
 ```bash
 python scripts/init_database.py
 ```
@@ -272,7 +292,8 @@ jumpchain_engine_v1/
 ├── scripts/
 │   ├── init_database.py           # Setup script
 │   ├── test_phase2.py            # Core mechanics tests
-│   └── test_momentum.py          # Momentum system tests
+│   ├── test_momentum.py          # Momentum system tests
+│   └── test_improvements.py      # Production readiness tests
 └── schema.sql                     # Database schema
 ```
 
@@ -301,6 +322,17 @@ python scripts/test_momentum.py
 # ✓ Impact Logging (real-world good deeds)
 # ✓ Compound Bonuses (exponential growth)
 # ✓ Momentum Summary (complete status)
+
+# Test production readiness improvements
+python scripts/test_improvements.py
+
+# All tests should pass:
+# ✓ .env Loading (environment variable management)
+# ✓ API Key Validation (startup checks)
+# ✓ Retry Logic (automatic retry with backoff)
+# ✓ Anthropic Provider SDK (official SDK integration)
+# ✓ Universal Client Validation (key checking)
+# ✓ Provider Retry Integration (all providers have retry)
 ```
 
 ---
