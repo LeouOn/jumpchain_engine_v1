@@ -105,32 +105,79 @@ jumpchain-engine/
 
 ---
 
-## Phase 2: Core Mechanics (NEXT)
+## Phase 2: Core Mechanics ✅ COMPLETE
 
-### To Implement
+### Completed Components
 
-#### 1. Calculation Engine
-- **src/engines/calculation.py**
-  - CP budget calculation
-  - Power synergy detection
-  - Combat power calculation
+#### 1. Calculation Engine ✅
+- **src/engines/calculation.py**: Full mechanical calculation system
+  - CP budget calculation with drawbacks and achievements
+  - Power synergy detection (known synergies + tag-based)
+  - Combat power calculation with multipliers
   - Perk conflict detection
-  - Build optimization (using DeepSeek R1)
+  - Build optimization algorithms
+  - Success probability estimation
+  - Power level tier system (Street → Multiversal)
+  - PRT-style threat rating (1-10)
 
-#### 2. Jump Document Parser
-- **src/parsers/jump_doc_parser.py**
-  - PDF parsing
-  - Perk extraction
+  **Known Synergies Database:**
+  - PtV + Blank = 15x (broken)
+  - PtV + Compassionate Transmutation = 10x (broken)
+  - Team Lead + Power Sharing = 6x (broken)
+  - And many more...
+
+#### 2. Jump Document Parser ✅
+- **src/parsers/jump_doc_parser.py**: PDF/TXT parsing system
+  - Text extraction from PDF and TXT files
+  - Automatic perk extraction with regex patterns
   - Item extraction
   - Drawback extraction
-  - Scenario extraction
+  - Scenario parsing
+  - Synergy tag inference from descriptions
+  - Supports multiple document formats
+  - Converts parsed data to Perk objects
 
-#### 3. Basic Turn Orchestrator
-- **src/core/orchestrator.py**
-  - Main game loop
-  - Action parsing
-  - Module coordination
-  - Result formatting
+#### 3. Turn Orchestrator ✅
+- **src/core/orchestrator.py**: Main game loop coordinator
+  - Complete turn processing pipeline
+  - Action parsing and classification
+  - Mechanical effect calculation
+  - Achievement detection and awarding
+  - Turn logging and state management
+  - Auto-backup system
+  - Game state summary generation
+  - Modular design ready for Phase 3 LLM integration
+
+#### 4. Configuration System ✅
+- **src/core/config.py**: Configuration manager
+  - YAML settings loader
+  - JSON achievement loader
+  - Environment variable overrides
+  - Default settings fallback
+  - LLM endpoint configuration
+  - Gameplay parameter management
+  - Debug mode support
+
+### Testing Status
+
+**All Phase 2 Tests Passing ✅**
+
+```bash
+python scripts/test_phase2.py
+```
+
+Test Results:
+- ✅ Calculation Engine: Synergy detection, power calculation, CP budgets, build optimization
+- ✅ Jump Parser: PDF parsing, perk/item/drawback extraction, tag inference
+- ✅ Turn Orchestrator: Turn processing, achievement awarding, state management
+- ✅ Configuration: Settings loading, achievement configs
+
+**Example Output:**
+- Detected PtV + Blank synergy: 15x multiplier (broken combo)
+- Power calculation: Planet Tier, 10/10 threat rating
+- CP Budget: 50,300 total (1000 base + 300 drawback + 49k achievement)
+- Build optimization: 90% efficiency
+- First turn achievement automatically awarded
 
 ---
 
@@ -266,7 +313,21 @@ None currently - Phase 1 complete and functional.
    - `turn` - Advance one day
    - `backup` - Backup database
 
+4. **Test Phase 2 Features**:
+   ```bash
+   python scripts/test_phase2.py
+   ```
+
+5. **Run Full Turn**:
+   ```python
+   from src.core.orchestrator import TurnOrchestrator
+   orchestrator = TurnOrchestrator()
+   result = orchestrator.process_turn("Use PtV to find optimal path")
+   print(result['narration'])
+   ```
+
 ---
 
 Last Updated: 2025-11-17
-Phase 1: ✅ COMPLETE
+Phase 1: ✅ COMPLETE (Foundation)
+Phase 2: ✅ COMPLETE (Core Mechanics)
